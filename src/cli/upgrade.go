@@ -124,7 +124,7 @@ var upgradeCmd = &cobra.Command{
 			return
 		}
 
-		if build.Version != latest {
+		if upgrade.IsNewerVersion(build.Version, latest) {
 			log.Debug("upgrade available")
 			exitcode = executeUpgrade(cfg.Upgrade)
 			return

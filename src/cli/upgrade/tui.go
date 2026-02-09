@@ -2,6 +2,7 @@ package upgrade
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	progress_ "github.com/charmbracelet/bubbles/progress"
@@ -163,4 +164,38 @@ func IsMajorUpgrade(current, latest string) bool {
 	}
 
 	return getMajorNumber(current) != getMajorNumber(latest)
+}
+
+func IsNewerVersion(current, latest string) bool {
+	if current == "" || latest == "" {
+		return false
+	}
+
+	getNumbers := func(version string) (int, int, int) {
+		major, rest, _ := strings.Cut(version, ".")
+		minor, patch, _ := strings.Cut(rest, ".")
+
+		majorNum, _ := strconv.Atoi(major)
+		minorNum, _ := strconv.Atoi(minor)
+		patchNum, _ := strconv.Atoi(patch)
+
+		return majorNum, minorNum, patchNum
+	}
+
+	currMajor, currMinor, currPatch := getNumbers(current)
+	latestMajor, latestMinor, latestPatch := getNumbers(latest)
+
+	if latestMajor > currMajor {
+		return true
+	} else if latestMajor < currMajor {
+		return false
+	}
+
+	if latestMinor > currMinor {
+		return true
+	} else if latestMinor < currMinor {
+		return false
+	}
+
+	return latestPatch > currPatch
 }

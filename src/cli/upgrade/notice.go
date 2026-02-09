@@ -40,7 +40,7 @@ func (cfg *Config) Notice() (string, bool) {
 		return "", false
 	}
 
-	if latest == build.Version {
+	if !IsNewerVersion(build.Version, latest) {
 		return "", false
 	}
 
