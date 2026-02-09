@@ -41,17 +41,14 @@ type Terminal struct {
 func initLoacl() {
 	var timeZone *time.Location
 
-	systemTimeZone, err := exec.CommandContext(context.Background(), "/system/bin/getprop", "persist.sys.timezone").Output()
+	systemTimeZone, err := cmd.Run("/system/bin/getprop", "persist.sys.timezone")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Failed to get systemTimeZone from OS")
-
-		systemTimeZone = []byte("UTC")
+		systemTimeZone = "UTC"
 	}
 
-	timeZone, err = time.LoadLocation(strings.TrimSpace(string(systemTimeZone)))
+	systemTimeZone = strings.TrimSpace(systemTimeZone)
+	timeZone, err = time.LoadLocation(systemTimeZone)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to compute timeZone from systemTimeZone: %s\n", string(systemTimeZone))
-
 		timeZone = time.Now().UTC().Location()
 	}
 
@@ -263,16 +260,22 @@ func (term *Terminal) User() string {
 
 func (term *Terminal) Host() (string, error) {
 	defer log.Trace(time.Now())
-	if len(term.host) != 0 {
-		return term.host, nil
+	// if len(term.host) != 0 {
+	// 	return term.host, nil
+	// }
+
+	// hostName, err := os.Hostname()
+	// if err != nil {
+	// 	log.Error(err)
+	// 	return "", err
+	// }
+
+	hostName := os.Getenv("HOST")
+	if hostName == "" {
+		hostName = os.Getenv("HOSTNAME")
 	}
 
-	hostName, err := os.Hostname()
-	if err != nil {
-		log.Error(err)
-		return "", err
-	}
-
+	// fmt.Println(hostName)
 	hostName = cleanHostName(hostName)
 	log.Debug(hostName)
 	term.host = hostName
