@@ -49,6 +49,7 @@ var upgradeCmd = &cobra.Command{
 			runtime.DARWIN,
 			runtime.LINUX,
 			runtime.FREEBSD,
+			runtime.ANDROID,
 		}
 
 		if !slices.Contains(supportedPlatforms, stdruntime.GOOS) {

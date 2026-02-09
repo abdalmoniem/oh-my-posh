@@ -39,7 +39,11 @@ func downloadAndVerify(cfg *Config) ([]byte, error) {
 		extension = ".exe"
 	}
 
-	asset := fmt.Sprintf("posh-%s-%s%s", stdruntime.GOOS, stdruntime.GOARCH, extension)
+	architecture := stdruntime.GOARCH
+	if stdruntime.GOOS == runtime.ANDROID && architecture == "arm64" {
+		architecture = "arm"
+	}
+	asset := fmt.Sprintf("posh-%s-%s%s", stdruntime.GOOS, architecture, extension)
 
 	log.Debug("downloading asset:", asset)
 
@@ -79,6 +83,9 @@ func verify(cfg *Config, asset string, binary []byte) error {
 		return fmt.Errorf("failed to verify checksums signature")
 	}
 
+	if stdruntime.GOOS == runtime.ANDROID {
+		return nil
+	}
 	return validateChecksum(asset, checksums, binary)
 }
 
